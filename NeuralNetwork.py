@@ -1,7 +1,7 @@
 
 
 
-class NeuralNetwork:
+class NeuralNetwork():
 
 
 	def __init__(self, inputNodes, hiddenNodes, outputNodes, learningRate):
@@ -24,7 +24,7 @@ class NeuralNetwork:
 
 
 
-nn = NeuralNetwork("", "", "", "")
 
+nn = NeuralNetwork("", "", "", "")
 
 nn.train()

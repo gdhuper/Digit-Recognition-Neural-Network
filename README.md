@@ -1,5 +1,6 @@
-### Digit Network Neural Network
+### Digit Recognition Neural Network
 
 ---
 --- 
 
+Building Neural Network from scratch to recognize digits
