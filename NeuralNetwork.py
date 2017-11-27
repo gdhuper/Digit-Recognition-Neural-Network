@@ -18,10 +18,8 @@ class NeuralNetwork():
 		print("stuff")
 
 
-
 	def query(self):
 		pass
-
 
 
 
