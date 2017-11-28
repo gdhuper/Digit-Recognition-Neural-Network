@@ -40,11 +40,10 @@ class NeuralNetwork():
 
 		result = [[0 for r in range(colsInputs)] for c in range(rowsWeights)] #initialize result matrix
 
-		for i in range(rowsWeights):
-			for j in range(colsInputs):
-				for k in range(colsWeights):
+		for i in range(colsWeights):
+			for j in range(rowsInputs):
+				for k in range(colsInputs):
 					result[i][j] += weights[i][k] * inputs[k][j]
-
 		return result
 
 
