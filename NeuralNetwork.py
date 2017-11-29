@@ -46,7 +46,6 @@ class NeuralNetwork():
 					result[i][j] += weights[i][k] * inputs[k][j]
 		return result
 
-
 def main():
 	nn = NeuralNetwork("", "", "", "")
 	#print(nn.sigmoid(1.05))
