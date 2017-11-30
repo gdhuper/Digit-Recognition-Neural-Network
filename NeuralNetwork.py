@@ -1,9 +1,10 @@
 import sys
 import math
 import numpy as np
+from numba import jit
+
 
 class NeuralNetwork():
-
 
 	def __init__(self, inputNodes, hiddenNodes, outputNodes, learningRate):
 		self.inodes = inputNodes
@@ -16,7 +17,7 @@ class NeuralNetwork():
 
 
 	def train(self):
-		print("stuff")
+		pass
 
 
 	def query(self):
@@ -24,7 +25,7 @@ class NeuralNetwork():
 
 
 	def sigmoid(self, x):
-		return 1 / (1 + math.exp(-x))
+		return 1.0 / (1.0 + np.exp(-x))
 
 	def dotproduct(self, weights, inputs):
 		#dot product using numpy
@@ -46,6 +47,7 @@ class NeuralNetwork():
 					result[i][j] += weights[i][k] * inputs[k][j]
 		return result
 
+@jit
 def main():
 	nn = NeuralNetwork("", "", "", "")
 	#print(nn.sigmoid(1.05))
