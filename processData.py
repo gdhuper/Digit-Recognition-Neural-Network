@@ -8,10 +8,10 @@ def processData():
 	data = np.genfromtxt('./data/mnist_test.csv', delimiter=',')
 	vectors = []
 
-	for line in data[:2]:
+	for line in data[:1]:
 		vectors.append(np.array(line))
 
-	print(vectors)
+	print(len(vectors[0]))
 
 
 if __name__ == '__main__':
