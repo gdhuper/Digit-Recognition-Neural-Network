@@ -5,12 +5,16 @@ import os
 os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 os.environ['PYOPENCL_CTX'] = '1'
 
-(n, m, p) = (700, 700, 700)
+#(n, m, p) = (700, 700, 700)
 
-def test():
+def dotProduct(a, b):
 	
-	a = np.random.randint(255, size=(n,m))
-	b = np.random.randint(255, size=(m,p))
+	#a = np.random.randint(255, size=(n,m))
+	#b = np.random.randint(255, size=(m,p))
+	n = a.shape[0]
+	m = a.shape[1]
+	p = b.shape[1]
+
 	c = np.zeros((n*p), dtype=np.float32)
 
 	a = a.astype(np.float32)
@@ -73,7 +77,6 @@ def test():
 	print("matrix B:")
 	print(b.reshape(m, p))
 	print("multiplied A*B:")
-	print(a_mul_b.reshape(n, p))
+	print(a_mul_b)
+	#print(a_mul_b.reshape(n, p))
 
-
-test()

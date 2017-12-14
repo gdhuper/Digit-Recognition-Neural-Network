@@ -3,7 +3,7 @@ import math
 import numpy as np
 from numba import jit
 import time
-from matrixMul import test
+from matrixMul import dotProduct
 
 
 class NeuralNetwork():
@@ -39,14 +39,21 @@ class NeuralNetwork():
 		# rowsInputs = len(inputs)
 		# colsInputs = len(inputs[0])
 
+		# rowsWeights = weights.shape[0]
+		# colsWeights = weights.shape[1]
+
+		# rowsInputs = inputs.shape[0]
+		# colsInputs = inputs.shape[1]
+
+
 		# if colsWeights != rowsInputs:
 		# 	return None
 
 		# result = [[0 for r in range(colsInputs)] for c in range(rowsWeights)] #initialize result matrix
 
-		# for i in range(colsWeights):
-		# 	for j in range(rowsInputs):
-		# 		for k in range(colsInputs):
+		# for i in range(rowsWeights):
+		# 	for j in range(colsInputs):
+		# 		for k in range(colsWeights):
 		# 			result[i][j] += weights[i][k] * inputs[k][j]
 		# return result
 
@@ -54,15 +61,18 @@ class NeuralNetwork():
 def main():
 	nn = NeuralNetwork("", "", "", "")
 	#print(nn.sigmoid(1.05))
+
+	#numpy 2d array creation: clean up later
 	# weights = np.matrix('1 2; 3 4')
 	# inputs = np.matrix('5 6; 7 8')
 
-	weights = [[1, 2], [3, 4]]
-	inputs = [[1, 2], [3, 4]]
+	#2d array creation pure python: clean up later
+	# weights = [[1, 2], [3, 4]]
+	# inputs = [[1, 2], [3, 4]]
 
 
-	a = np.random.randint(255, size=(700,700))
-	b = np.random.randint(255, size=(700,700))
+	a = np.random.randint(255, size=(100,784))
+	b = np.random.randint(255, size=(784,1))
 
 	
 	start_time = time.time()
@@ -70,15 +80,15 @@ def main():
 	t1 = (time.time() - start_time)
 	print("--- %s seconds ---" % t1)
 
-
 	start_time2 = time.time()
-	test()
+	print(a.shape[0], a.shape[1], b.shape[0], b.shape[1])
+	dotProduct(a, b)
 	t2 = (time.time() - start_time2)
 	print("--- %s seconds ---" % t2)
 
-	print("Regular: ", t1)
+	print("Pure Python: ", t1)
 	print("OpenCL: ", t2)
-	print("Regular is faster" if t1 < t2 else "OpenCl is faster")
+	print("Pure Python is faster" if t1 < t2 else "OpenCl is faster")
 
 if __name__ == '__main__':
 	main()
