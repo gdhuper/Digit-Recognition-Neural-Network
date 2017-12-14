@@ -1,35 +1,79 @@
-import numpy as np
 import pyopencl as cl
+import numpy as np
 
-a_np = np.random.rand(100000).astype(np.float32)
-b_np = np.random.rand(100000).astype(np.float32)
+import os
+os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
+os.environ['PYOPENCL_CTX'] = '1'
 
-ctx = cl.create_some_context()
-queue = cl.CommandQueue(ctx)
+(n, m, p) = (700, 700, 700)
 
-mf = cl.mem_flags
-a_g = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=a_np)
-b_g = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=b_np)
+def test():
+	
+	a = np.random.randint(255, size=(n,m))
+	b = np.random.randint(255, size=(m,p))
+	c = np.zeros((n*p), dtype=np.float32)
 
-prg = cl.Program(ctx, """
-__kernel void sum(
-    __global const float *a_g, __global const float *b_g, __global float *res_g)
-{
-  int gid = get_global_id(0);
-  res_g[gid] = a_g[gid] + b_g[gid];
-}
-""").build()
+	a = a.astype(np.float32)
 
-res_g = cl.Buffer(ctx, mf.WRITE_ONLY, a_np.nbytes)
-prg.sum(queue, a_np.shape, None, a_g, b_g, res_g)
+	b = b.astype(np.float32)
 
-res_np = np.empty_like(a_np)
-cl.enqueue_copy(queue, res_np, res_g)
 
-# Check on CPU with Numpy:
-print(res_np - (a_np + b_np))
-print(np.linalg.norm(res_np - (a_np + b_np)))
+	platform = cl.get_platforms() 
+	gpu_devices = platform[0].get_devices(device_type=cl.device_type.GPU)
 
-platform = cl.get_platforms()[0]
-device = platform.get_devices()
-print(platform, device)
+	#building context using gpu 
+	ctx = cl.Context(devices=gpu_devices)
+
+	#initiating queue with context
+	queue = cl.CommandQueue(ctx)
+
+	mf = cl.mem_flags
+
+	#transforming input vectors to device memory 
+	a_buf = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=a)
+	b_buf = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=b)
+
+	#buffer for resulting vector
+	c_buf = cl.Buffer(ctx, mf.WRITE_ONLY, c.nbytes)
+
+
+	prg = cl.Program(ctx, """
+	    __kernel void multiply(ushort n,
+	    ushort m, ushort p, __global float *a,
+	    __global float *b, __global float *c)
+	    {
+	      int gid = get_global_id(0);
+	      c[gid] = 0.0f;
+	      int rowC = gid/p;
+	      int colC = gid%p;
+	      __global float *pA = &a[rowC*m];
+	      __global float *pB = &b[colC];
+	      for(int k=0; k<m; k++)
+	      {
+	         pB = &b[colC+k*p];
+	         c[gid] += (*(pA++))*(*pB);
+	      }
+	    }
+	    """ ).build()
+
+
+	#executing dot product of matrix a and matrix b
+	prg.multiply(queue, c.shape, None,
+	             np.uint16(n), np.uint16(m), np.uint16(p),
+	             a_buf, b_buf, c_buf)
+
+	#empty matrix to hold dot product
+	a_mul_b = np.empty_like(c)
+
+	#copying result from buffer to result matrix
+	cl.enqueue_copy(queue, a_mul_b, c_buf)
+
+	print("matrix A:")
+	print(a.reshape(n, m))
+	print("matrix B:")
+	print(b.reshape(m, p))
+	print("multiplied A*B:")
+	print(a_mul_b.reshape(n, p))
+
+
+test()
