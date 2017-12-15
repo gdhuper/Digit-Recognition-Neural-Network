@@ -79,4 +79,8 @@ def dotProduct(a, b):
 	print("multiplied A*B:")
 	print(a_mul_b)
 	#print(a_mul_b.reshape(n, p))
+	return a_mul_b
+
+
+
 

@@ -3,78 +3,62 @@ import math
 import numpy as np
 from numba import jit
 import time
-from matrixMul import dotProduct
+from util import dotProduct
+from processData import getData
+import pandas as pd
 
 
 class NeuralNetwork():
 
 	def __init__(self, inputNodes, hiddenNodes, outputNodes, learningRate):
-		self.inodes = inputNodes
-		self.hnodes = hiddenNodes
-		self.onodes = outputNodes
+		self.inputNodes = inputNodes
+		self.hiddenNodes = hiddenNodes
+		self.outputNodes = outputNodes
 
 		#learning rate 
-		self.lr = learningRate
+		self.learningRate = learningRate
+
+		#seed for consistent values
+		#np.random.seed(1)
+
+		#weights (synapses) between input layer nodes and hidden layer nodes
+		self.syn0 = 2*np.random.random((self.inputNodes, self.hiddenNodes)) - 1
+
+		#weights (synapses) between hidden layer nodes and output layer nodes
+		self.syn1 = 2*np.random.random((self.hiddenNodes, self.outputNodes)) - 1
 
 
 
-	def train(self):
+	def train(self, input, outputValues):
+		"""
+		Trains neural network (feed forward) and backpropogation
+    	:param expected: input node values (vectors from .csv file) and output node values based on given label
+    	:return: None
+    	"""
 		pass
 
 
 	def query(self):
 		pass
 
-
-	def sigmoid(self, x):
+	def sigmoid(self, x, deriv=False):
+		if deriv == True:
+			return x * (1.0 - x)
 		return 1.0 / (1.0 + np.exp(-x))
 
 	def dotproduct(self, weights, inputs):
 		#dot product using numpy
 		return np.dot(weights, inputs) 
 
-		# rowsWeights = len(weights)
-		# colsWeights = len(weights[0])
-
-		# rowsInputs = len(inputs)
-		# colsInputs = len(inputs[0])
-
-		# rowsWeights = weights.shape[0]
-		# colsWeights = weights.shape[1]
-
-		# rowsInputs = inputs.shape[0]
-		# colsInputs = inputs.shape[1]
 
 
-		# if colsWeights != rowsInputs:
-		# 	return None
-
-		# result = [[0 for r in range(colsInputs)] for c in range(rowsWeights)] #initialize result matrix
-
-		# for i in range(rowsWeights):
-		# 	for j in range(colsInputs):
-		# 		for k in range(colsWeights):
-		# 			result[i][j] += weights[i][k] * inputs[k][j]
-		# return result
-
-@jit
-def main():
-	nn = NeuralNetwork("", "", "", "")
-	#print(nn.sigmoid(1.05))
-
-	#numpy 2d array creation: clean up later
-	# weights = np.matrix('1 2; 3 4')
-	# inputs = np.matrix('5 6; 7 8')
-
-	#2d array creation pure python: clean up later
-	# weights = [[1, 2], [3, 4]]
-	# inputs = [[1, 2], [3, 4]]
-
+#helper function to unit test function
+def test():
+	nn = NeuralNetwork("inputNodes", "hiddleNodes", "outNodes", "learningRate")
 
 	a = np.random.randint(255, size=(100,784))
 	b = np.random.randint(255, size=(784,1))
 
-	
 	start_time = time.time()
 	print(nn.dotproduct(a, b))
 	t1 = (time.time() - start_time)
@@ -89,6 +73,52 @@ def main():
 	print("Pure Python: ", t1)
 	print("OpenCL: ", t2)
 	print("Pure Python is faster" if t1 < t2 else "OpenCl is faster")
+	
+
+
+
+@jit
+def main():
+	inputNodes = 784
+	hiddleNodes = 100
+	outNodes = 10
+
+	learningRate = 0.5
+
+	#create instance of neural net with input parameters
+	nn = NeuralNetwork(inputNodes, hiddleNodes, outNodes, learningRate)
+
+	inputVectors = getData()
+
+	for vector in inputVectors:
+		label = vector[0]
+		inodes = vector[1:]
+
+
+
+
+
+
+
+	
+	
+
 
 if __name__ == '__main__':
 	main()
+
+
+
+# # train the network
+# epochs = 5
+
+# for e in range(epochs):
+#     for record in training_data_list:
+#         all_values = record.split(',')
+#         inputs = (numpy.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
+#         targets = numpy.zeros(output_nodes) + 0.01
+#         # all_values[0] is the target label for this record
+#         targets[int(all_values[0])] = 0.99
+#         n.train(inputs, targets)
+#         pass
+#     pass
