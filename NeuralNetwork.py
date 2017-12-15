@@ -3,7 +3,6 @@ import math
 import numpy as np
 from numba import jit
 import time
-from util import dotProduct
 from processData import getData
 import pandas as pd
 
@@ -22,20 +21,42 @@ class NeuralNetwork():
 		#np.random.seed(1)
 
 		#weights (synapses) between input layer nodes and hidden layer nodes
-		self.syn0 = 2*np.random.random((self.inputNodes, self.hiddenNodes)) - 1
+		self.syn0 = (2*np.random.random((self.inputNodes, self.hiddenNodes)) - 1).T
 
 		#weights (synapses) between hidden layer nodes and output layer nodes
-		self.syn1 = 2*np.random.random((self.hiddenNodes, self.outputNodes)) - 1
+		self.syn1 = (2*np.random.random((self.hiddenNodes, self.outputNodes)) - 1).T
 
 
+		self.normalize_vals = lambda x: (x / 255.0 * 0.99) + 0.01
 
-	def train(self, input, outputValues):
+
+	def train(self, inputValues, outputValues):
 		"""
 		Trains neural network (feed forward) and backpropogation
     	:param expected: input node values (vectors from .csv file) and output node values based on given label
     	:return: None
     	"""
-		pass
+    	#### forward pass ###
+    	
+    	#dot product between input layer and hidden layer
+		x_hidden = self.dotproduct(self.syn0, self.normalize_vals(inputValues))
+
+		# calculating sigmoid value for hidden layer nodes
+		o_hidden = self.sigmoid(x_hidden)
+
+		# dot product between hidden layer and output
+		x_output_layer = self.dotproduct(self.syn1, o_hidden)
+
+		# calculating sigmoid for output layer
+		o_output_layer = self.sigmoid(x_output_layer).T
+
+		# calculating error rate for final output
+		delta = outputValues - o_output_layer
+
+		print("delta\n", delta)
+
+		### backpropogation ###
+
 
 
 	def query(self):
@@ -90,11 +111,29 @@ def main():
 
 	inputVectors = getData()
 
-	for vector in inputVectors:
-		label = vector[0]
-		inodes = vector[1:]
+	epoch = 1
 
+	for i in range(epoch):
+		for vector in inputVectors:
+			#strip label from each vector
+			label = vector[0]
 
+			#values for input nodes in input layer
+			inodes = vector[1:]
+
+			#reshaping 1d array to 2D array for dot product compatibility 
+			inNodes = np.reshape(inodes, (inputNodes, 1))
+
+			#expected output values for output layer
+			outputValues = np.zeros(outNodes) + 0.01
+
+			#set result node to 0.99
+			outputValues[label] = 0.99
+
+			outNodes = np.reshape(outputValues, (10, 1))
+
+			nn.train(inNodes, outputValues)
+			break
 
 
 
