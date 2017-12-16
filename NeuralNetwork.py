@@ -51,21 +51,45 @@ class NeuralNetwork():
 		o_output_layer = self.sigmoid(x_output_layer)
 
 		# calculating error rate for final output
-		delta = outputValues - o_output_layer
+		final_error = outputValues - o_output_layer
 
-		print("Error: " + str(np.mean(np.abs(delta))))
+		print("Error: " + str(np.mean(np.abs(final_error))))
 		
 		### backpropogation ###
-		tmp = self.dotproduct(self.syn1.T, delta)
+		hidden_layer_error = self.dotproduct(self.syn1.T, final_error)
 
-		#print(tmp)
+		#print(hidden_layer_error)
 
+		
 
+		t_layer1 = final_error * (o_output_layer * (1.0 - o_output_layer))
+
+		t_layer0 = hidden_layer_error * (o_hidden * (1.0 - o_hidden))
+
+		# print(t_layer1)
+
+		# print(t_layer0)
+
+		self.syn1 += self.learningRate * np.dot(t_layer1, o_hidden.T)
+
+		self.syn0 += self.learningRate * np.dot(t_layer0.T, x_hidden)
 		
 
 
 
-	def query(self):
+	def query(self, inputValues):
+		#dot product between input layer and hidden layer
+		x_hidden = self.dotproduct(self.syn0, self.normalize_vals(inputValues))
+
+		# calculating sigmoid value for hidden layer nodes
+		o_hidden = self.sigmoid(x_hidden)
+
+		# dot product between hidden layer and output
+		x_output_layer = self.dotproduct(self.syn1, o_hidden)
+
+		# calculating sigmoid for output layer
+		o_output_layer = self.sigmoid(x_output_layer)
+
 		pass
 
 	def sigmoid(self, x, deriv=False):
@@ -146,14 +170,7 @@ def main():
 			
 	t1 = (time.time() - start_time)
 	print("--- %s seconds ---" % t1)
-
-
-
-
-
 	
-	
-
 
 if __name__ == '__main__':
 	main()
