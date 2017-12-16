@@ -7,7 +7,7 @@ import time
 
 @jit
 def getData(testData=False):
-	if(testData == True):
+	if(testData):
 		df = pd.read_csv('./data/mnist_test.csv', header=None, engine='c', na_filter=False)
 		return df.values
 

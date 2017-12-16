@@ -150,7 +150,7 @@ def main():
 	inputVectors = getData()
 
 	#training neural net 
-	epoch = 4
+	epoch = 3
 
 	start_time = time.time()
 	
@@ -176,10 +176,7 @@ def main():
 			
 			outNodeValues = np.reshape(outputValues, (10, 1))
 
-			nn.train(inodes, outNodeValues)
-
-		
-			
+			nn.train(inodes, outNodeValues)		
 			
 			
 	t1 = (time.time() - start_time)
@@ -199,6 +196,8 @@ def main():
 
 		predicted_label = np.argmax(predicted_outputs)
 
+		print("True label : {}, Predicated Label: {}".format(true_label, predicted_label))
+
 		if predicted_label == true_label:
 			correct_predictions += 1
 
@@ -210,18 +209,3 @@ def main():
 if __name__ == '__main__':
 	main()
 
-
-
-# # train the network
-# epochs = 5
-
-# for e in range(epochs):
-#     for record in training_data_list:
-#         all_values = record.split(',')
-#         inputs = (numpy.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
-#         targets = numpy.zeros(output_nodes) + 0.01
-#         # all_values[0] is the target label for this record
-#         targets[int(all_values[0])] = 0.99
-#         n.train(inputs, targets)
-#         pass
-#     pass
