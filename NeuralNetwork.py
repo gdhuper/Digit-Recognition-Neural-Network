@@ -36,8 +36,8 @@ class NeuralNetwork():
     	:param expected: input node values (vectors from .csv file) and output node values based on given label
     	:return: None
     	"""
-    	#### forward pass ###
-    	
+    	### forward pass ###
+
     	#dot product between input layer and hidden layer
 		x_hidden = self.dotproduct(self.syn0, self.normalize_vals(inputValues))
 
@@ -48,14 +48,20 @@ class NeuralNetwork():
 		x_output_layer = self.dotproduct(self.syn1, o_hidden)
 
 		# calculating sigmoid for output layer
-		o_output_layer = self.sigmoid(x_output_layer).T
+		o_output_layer = self.sigmoid(x_output_layer)
 
 		# calculating error rate for final output
 		delta = outputValues - o_output_layer
 
-		print("delta\n", delta)
-
+		print("Error: " + str(np.mean(np.abs(delta))))
+		
 		### backpropogation ###
+		tmp = self.dotproduct(self.syn1.T, delta)
+
+		#print(tmp)
+
+
+		
 
 
 
@@ -110,11 +116,14 @@ def main():
 	nn = NeuralNetwork(inputNodes, hiddleNodes, outNodes, learningRate)
 
 	inputVectors = getData()
+	print(inputVectors)
 
 	epoch = 1
-
+	
+	start_time = time.time()
 	for i in range(epoch):
 		for vector in inputVectors:
+
 			#strip label from each vector
 			label = vector[0]
 
@@ -129,11 +138,14 @@ def main():
 
 			#set result node to 0.99
 			outputValues[label] = 0.99
+			
+			outNodeValues = np.reshape(outputValues, (10, 1))
 
-			outNodes = np.reshape(outputValues, (10, 1))
-
-			nn.train(inNodes, outputValues)
-			break
+			nn.train(inNodes, outNodeValues)
+			
+			
+	t1 = (time.time() - start_time)
+	print("--- %s seconds ---" % t1)
 
 
 
