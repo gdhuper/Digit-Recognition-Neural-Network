@@ -84,3 +84,24 @@ def dotProduct(a, b):
 
 
 
+#helper function to unit test function
+def test():
+	#nn = NeuralNetwork("inputNodes", "hiddleNodes", "outNodes", "learningRate")
+
+	a = np.random.randint(255, size=(100,784))
+	b = np.random.randint(255, size=(784,1))
+
+	start_time = time.time()
+	#print(nn.dotproduct(a, b))
+	t1 = (time.time() - start_time)
+	print("--- %s seconds ---" % t1)
+
+	start_time2 = time.time()
+	print(a.shape[0], a.shape[1], b.shape[0], b.shape[1])
+	#dotProduct(a, b)
+	t2 = (time.time() - start_time2)
+	print("--- %s seconds ---" % t2)
+
+	print("Pure Python: ", t1)
+	print("OpenCL: ", t2)
+	print("Pure Python is faster" if t1 < t2 else "OpenCl is faster")

@@ -1,0 +1,13 @@
+Files Required:
+
+1. processData.py 
+2. NeuralNetwork.py
+
+How to run: 
+
+1. Change path to .csv files in processData.py to your local computer's path
+==> df = pd.read_csv('./data/mnist_train.csv', header=None, engine='c', na_filter=False)
+
+2. Install numpy, pandas using pip
+
+3. Run python NeuralNetwork.py to train and test neural net.

@@ -1,11 +1,10 @@
 import sys
 import math
 import numpy as np
-from numba import jit
 import time
 from processData import getData
 import pandas as pd
-from tqdm import tqdm
+
 
 class NeuralNetwork():
 
@@ -22,11 +21,10 @@ class NeuralNetwork():
 
 		#weights (synapses) between input layer nodes and hidden layer nodes
 		self.syn0 = 2*np.random.random((self.hiddenNodes, self.inputNodes)) - 1
-		#print(self.syn0.shape)
 
 		#weights (synapses) between hidden layer nodes and output layer nodes
 		self.syn1 = 2*np.random.random((self.outputNodes ,self.hiddenNodes)) - 1
-		#print(self.syn1.shape)
+		
 
 		#lambda function to normalize vector values
 		self.normalize_vals = lambda x: (np.asfarray(x) / 255.0 * 0.99) + 0.01
@@ -43,38 +41,35 @@ class NeuralNetwork():
     	#dot product between input layer and hidden layer
 		x_hidden = self.dotproduct(self.syn0, inputValues)
 
-		#print("x_hidden", x_hidden.shape)
+		
 
 		# calculating sigmoid value for hidden layer nodes
 		o_hidden = self.sigmoid(x_hidden)
-		#print("o_hidden", o_hidden.shape)
 
-		# dot product between hidden layer and output
+		# dot product between hidden layer and output layer
 		x_output_layer = self.dotproduct(self.syn1, o_hidden)
-		#print("x_outputlayer ",x_output_layer.shape)
 
 		# calculating sigmoid for output layer
 		o_output_layer = self.sigmoid(x_output_layer)
-		#print("o_outputlayer ",o_output_layer.shape)
 
 
 		# calculating error rate for final output
 		final_error = outputValues - o_output_layer
 
-		print("Error: " + str(np.mean(np.abs(final_error))))
+		#print("Error: " + str(np.mean(np.abs(final_error))))
 		
 		### backpropogation ###
+
+		#calculating error for hidden layer
 		hidden_layer_error = self.dotproduct(self.syn1.T, final_error)
-
 		
-		t_layer1 = final_error * (o_output_layer * (1.0 - o_output_layer))
-
-		t_layer0 = hidden_layer_error * (o_hidden * (1.0 - o_hidden))
 
 		#updating weights between hidden layer and output layer using gradient descent
+		t_layer1 = final_error * (o_output_layer * (1.0 - o_output_layer))
 		self.syn1 += self.learningRate * np.dot(t_layer1, o_hidden.T)
 
 		#updating weights between input layer and hidden layer using gradient descent
+		t_layer0 = hidden_layer_error * (o_hidden * (1.0 - o_hidden))
 		self.syn0 += self.learningRate * np.dot(t_layer0, inputValues.T)
 		
 
@@ -84,21 +79,17 @@ class NeuralNetwork():
 		#dot product between input layer and hidden layer
 		x_hidden = self.dotproduct(self.syn0, inputValues)
 
-		#print("x_hidden", x_hidden.shape)
-
 		# calculating sigmoid value for hidden layer nodes
 		o_hidden = self.sigmoid(x_hidden)
-		#print("o_hidden", o_hidden.shape)
 
 		# dot product between hidden layer and output
 		x_output_layer = self.dotproduct(self.syn1, o_hidden)
-		#print("x_outputlayer ",x_output_layer.shape)
 
 		# calculating sigmoid for output layer
 		o_output_layer = self.sigmoid(x_output_layer)
-		#print("o_outputlayer ",o_output_layer.shape)
 
 		return o_output_layer
+
 
 	def sigmoid(self, x, deriv=False):
 		if deriv == True:
@@ -110,33 +101,8 @@ class NeuralNetwork():
 		return np.dot(weights, inputs) 
 
 
-
-#helper function to unit test function
-def test():
-	nn = NeuralNetwork("inputNodes", "hiddleNodes", "outNodes", "learningRate")
-
-	a = np.random.randint(255, size=(100,784))
-	b = np.random.randint(255, size=(784,1))
-
-	start_time = time.time()
-	print(nn.dotproduct(a, b))
-	t1 = (time.time() - start_time)
-	print("--- %s seconds ---" % t1)
-
-	start_time2 = time.time()
-	print(a.shape[0], a.shape[1], b.shape[0], b.shape[1])
-	dotProduct(a, b)
-	t2 = (time.time() - start_time2)
-	print("--- %s seconds ---" % t2)
-
-	print("Pure Python: ", t1)
-	print("OpenCL: ", t2)
-	print("Pure Python is faster" if t1 < t2 else "OpenCl is faster")
 	
 
-
-
-@jit
 def main():
 	inputNodes = 784
 	hiddleNodes = 100
@@ -163,11 +129,7 @@ def main():
 
 			#values for input nodes in input layer
 			inodes = nn.normalize_vals(vector[1:]).reshape(inputNodes, 1)
-			#print(inodes.shape)
-
-			#reshaping 1d array to 2D array for dot product compatibility 
-			#inNodes = np.reshape(inodes, (inputNodes, 1))
-
+		
 			#expected output values for output layer
 			outputValues = np.zeros(outNodes) + 0.01
 
@@ -188,12 +150,14 @@ def main():
 	testVectors = getData(testData=True)
 
 	for vector in testVectors:
+		#actual label
 		true_label = vector[0]
 
 		inodes = nn.normalize_vals(vector[1:]).reshape(inputNodes, 1)
 
 		predicted_outputs = nn.query(inodes)
 
+		#predicted label
 		predicted_label = np.argmax(predicted_outputs)
 
 		print("True label : {}, Predicated Label: {}".format(true_label, predicted_label))
@@ -202,6 +166,7 @@ def main():
 			correct_predictions += 1
 
 	print("accuracy : " + str(correct_predictions / len(testVectors)))
+	#accuracy = 93-94% with epoch = 3, and learning rate = 0.3
 
 
 	
