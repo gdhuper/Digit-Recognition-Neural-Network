@@ -142,6 +142,7 @@ def main():
 			
 			
 	t1 = (time.time() - start_time)
+	
 	print("--- %s seconds ---" % t1)
 
 	correct_predictions = 0
